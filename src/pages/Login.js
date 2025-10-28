@@ -16,7 +16,7 @@ const Login = () => {
     setError('');
     try {
       await login(email, password);
-      navigate('/'); // redirect to home/landing after login
+      navigate('/main'); // redirect to home/landing after login
     } catch (err) {
       setError(err.message);
     }
