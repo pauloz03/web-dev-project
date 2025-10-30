@@ -5,7 +5,6 @@ import io from "socket.io-client";
 import "./ChatRoom.css";
 
 const BACKEND_URL = "http://localhost:5001";
-const socket = io(BACKEND_URL);
 
 const ChatRoom = () => {
   const { roomName } = useParams();
@@ -13,6 +12,18 @@ const ChatRoom = () => {
   const [newMessage, setNewMessage] = useState("");
   const [username, setUsername] = useState("Anonymous");
   const messagesEndRef = useRef(null);
+
+  const [socket, setSocket] = useState(null);
+
+  // 0️⃣ Initialize socket connection once
+  useEffect(() => {
+    const newSocket = io(BACKEND_URL);
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
 
   // 1️⃣ Fetch existing messages on mount
   useEffect(() => {
@@ -30,26 +41,25 @@ const ChatRoom = () => {
 
   // 2️⃣ Join socket room & listen for incoming messages
   useEffect(() => {
+    if (!socket) return;
+
     socket.emit("join_room", roomName);
 
     const handleMessage = (msg) => setMessages((prev) => [...prev, msg]);
     socket.on("receive_message", handleMessage);
 
-    // Cleanup to prevent duplicate listeners
-    return () => {
-      socket.off("receive_message", handleMessage);
-    };
-  }, [roomName]);
+    return () => socket.off("receive_message", handleMessage);
+  }, [socket, roomName]);
 
-  // 3️⃣ Auto-scroll to bottom whenever messages update
+  // 3️⃣ Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   // 4️⃣ Send message
-  const handleSend = async (e) => {
+  const handleSend = (e) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !socket) return;
 
     const messageData = {
       authorUsername: username || "Anonymous",
@@ -57,23 +67,11 @@ const ChatRoom = () => {
       room: roomName,
     };
 
-    // 4a️⃣ Add locally immediately for instant feedback
-    setMessages((prev) => [...prev, messageData]);
+    // Emit via socket only
+    socket.emit("send_message", messageData);
+
+    // Clear input
     setNewMessage("");
-
-    try {
-      // 4b️⃣ Persist message in MongoDB
-      await fetch(`${BACKEND_URL}/chat/${roomName}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(messageData),
-      });
-
-      // 4c️⃣ Emit via socket for other users
-      socket.emit("send_message", messageData);
-    } catch (err) {
-      console.error("Error sending message:", err);
-    }
   };
 
   return (
