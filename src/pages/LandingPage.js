@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './LandingPage.css';
+import Navbar from "../components/navbar.js"
 
 function LandingPage() {
   return (
+    <>
+    <Navbar />
     <div className="landing-container">
       <div className="landing-content">
         <h1 className="landing-title">College Notetakers</h1>
@@ -13,6 +16,7 @@ function LandingPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

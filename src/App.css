@@ -1,38 +1,139 @@
-.App {
-  text-align: center;
+
+/* Navbar container */
+.navbar {
+  width: 100%;
+  background-color: #1a1a1a; /* dark background */
+  padding: 0.8rem 2rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Navigation */
+.navbar-nav {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Link list */
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+/* Individual links */
+.navbar-links li a {
+  color: #ccc; /* light gray text */
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.2s, border-bottom 0.2s;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+
+/* Active link */
+.navbar-links li a.active-link {
+  color: #fff; /* white for active */
+  border-bottom: 2px solid #00bfff; /* subtle accent */
+}
+
+/* Hover effect */
+.navbar-links li a:hover {
+  color: #fff;
+  border-bottom: 2px solid #00bfff;
+}
+
+/* Responsive for small screens */
+@media (max-width: 768px) {
+  .navbar-nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navbar-links {
+    flex-direction: column;
+    gap: 1rem;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+
+/* Hamburger button */
+.hamburger {
+  position: fixed;
+  top: 1rem;
+  left: 1.5rem; /* move to left */
+  width: 30px;
+  height: 25px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.hamburger span {
+  display: block;
+  height: 3px;
+  background-color: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Hamburger animation when open */
+.hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Vertical menu */
+.vertical-menu {
+  position: fixed;
+  top: 0;
+  left: -250px; /* hidden by default on the left */
+  width: 250px;
+  height: 100%;
+  background-color: #1a1a1a;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5); /* shadow on right edge */
+  transition: left 0.3s ease;
+  z-index: 1000;
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  align-items: center;
+}
+
+.vertical-menu.open {
+  left: 0; /* slide in from left */
+}
+
+.vertical-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.vertical-menu ul li a {
+  text-decoration: none;
   color: white;
+  font-size: 1.2rem;
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.vertical-menu ul li a:hover,
+.vertical-menu ul li a.active {
+  color: #00bfff;
 }

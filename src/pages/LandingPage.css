@@ -1,3 +1,13 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden; /* prevent horizontal scroll */
+  box-sizing: border-box;
+  background-color: #0a1d4d; /* fallback background to match gradient */
+}
+
+
 .landing-container {
   display: flex;
   justify-content: center;

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import navbar2 from "../components/navbar2.js"
 import "./mainPage.css";
+import NavbarLeft from "../components/navbar2.js";
 
 const Main = () => {
   const navigate = useNavigate();
@@ -12,6 +14,8 @@ const Main = () => {
   };
 
   return (
+    <>
+   <NavbarLeft/>
     <div className="main-container">
       <p className="welcome-text">Welcome</p>
 
@@ -26,6 +30,7 @@ const Main = () => {
         Start Chat
       </button>
     </div>
+    </>
   );
 };
 
