@@ -25,7 +25,7 @@ export default function NavbarLeft() {
             <NavLink to="/documents" onClick={() => setIsOpen(false)}>My Documents</NavLink>
           </li>
           <li>
-            <NavLink to="/classroom" onClick={() => setIsOpen(false)}>Classroom</NavLink>
+            <NavLink to="/main" onClick={() => setIsOpen(false)}>Classroom</NavLink>
           </li>
           <li>
             <NavLink to="/collaborate" onClick={() => setIsOpen(false)}>Collaborate</NavLink>

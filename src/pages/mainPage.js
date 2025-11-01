@@ -1,35 +1,39 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import navbar2 from "../components/navbar2.js"
-import "./mainPage.css";
 import NavbarLeft from "../components/navbar2.js";
+import "./mainPage.css";
 
 const Main = () => {
   const navigate = useNavigate();
-  const [roomName, setRoomName] = useState("general"); // default room
+  const [roomName, setRoomName] = useState("general");
 
   const handleStartChat = () => {
     if (!roomName.trim()) return;
-    navigate(`/chat/${roomName}`); // include room name in URL
+    navigate(`/chat/${roomName}`);
   };
 
   return (
     <>
-   <NavbarLeft/>
-    <div className="main-container">
-      <p className="welcome-text">Welcome</p>
+      <NavbarLeft />
+      <div className="main-container">
+        <div className="main-panel">
+          <input
+            type="text"
+            placeholder="Enter room name..."
+            value={roomName}
+            onChange={(e) => setRoomName(e.target.value)}
+          />
 
-      <input
-        type="text"
-        placeholder="Enter room name..."
-        value={roomName}
-        onChange={(e) => setRoomName(e.target.value)}
-      />
-
-      <button className="start-chat-btn" onClick={handleStartChat}>
-        Start Chat
-      </button>
-    </div>
+          <div className="button-group">
+            <button className="start-chat-btn" onClick={handleStartChat}>
+              Start Chat
+            </button>
+            <button className="add-friend-btn">
+              Add Friend
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
