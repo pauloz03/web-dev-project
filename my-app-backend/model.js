@@ -45,4 +45,27 @@ const roomSchema = new Schema(
 
 const Room = mongoose.model("Room", roomSchema);
 
+// Document schema for real-time text editor
+const documentSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    content: {
+      type: String,
+      default: "",
+    },
+    author: {
+      type: String,
+      default: "Anonymous",
+    },
+  },
+  { timestamps: true }
+);
+
+const Document = mongoose.model("Document", documentSchema);
+
 export default Room;
+export { Document };
