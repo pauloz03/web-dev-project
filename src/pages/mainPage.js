@@ -28,7 +28,10 @@ const Main = () => {
             <button className="start-chat-btn" onClick={handleStartChat}>
               Start Chat
             </button>
-            <button className="add-friend-btn">
+            <button 
+              className="add-friend-btn"
+              onClick={() => navigate("/invite")}
+            >
               Add Friend
             </button>
           </div>

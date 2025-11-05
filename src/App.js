@@ -7,6 +7,7 @@ import Signup from './pages/Signup';
 import Main from './pages/mainPage';
 import ChatRoom from './pages/ChatRoom';
 import Collaborate from './pages/Collaborate';
+import InviteFriends from './pages/InviteFriends';
 import './App.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
 
       <Route path="/chat/:roomName" element={<ChatRoom />} />
       <Route path="/collaborate" element={<Collaborate />} />
+      <Route path="/invite" element={<InviteFriends />} />
     </Routes>
   );
 }

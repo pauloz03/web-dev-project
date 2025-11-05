@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import io from "socket.io-client";
 import NavbarLeft from "../components/navbar2.js";
 import "./Collaborate.css";
@@ -6,6 +7,7 @@ import "./Collaborate.css";
 const BACKEND_URL = "http://localhost:5001";
 
 const Collaborate = () => {
+  const [searchParams] = useSearchParams();
   const [documentName, setDocumentName] = useState("");
   const [items, setItems] = useState([]);
   const [newItemText, setNewItemText] = useState("");
@@ -28,6 +30,15 @@ const Collaborate = () => {
       newSocket.disconnect();
     };
   }, []);
+
+  // Check for checklist parameter from invitation link
+  useEffect(() => {
+    const checklistParam = searchParams.get("checklist");
+    if (checklistParam && !isEditing) {
+      setDocumentName(checklistParam);
+      setShowSavedList(false);
+    }
+  }, [searchParams, isEditing]);
 
   // Fetch saved checklists when not editing
   useEffect(() => {

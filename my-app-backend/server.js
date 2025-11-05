@@ -7,6 +7,7 @@ import http from "http";
 import { Server } from "socket.io";
 import chatRouter from "./chat.js";
 import documentsRouter from "./documents.js";
+import invitationsRouter from "./invitations.js";
 import Room, { Document } from "./model.js";
 
 dotenv.config();
@@ -30,6 +31,7 @@ mongoose
 // Routes
 app.use("/chat", chatRouter);
 app.use("/documents", documentsRouter);
+app.use("/invitations", invitationsRouter);
 
 // Default route
 app.get("/", (req, res) => {
