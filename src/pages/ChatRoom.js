@@ -4,7 +4,8 @@ import { useParams } from "react-router-dom";
 import io from "socket.io-client";
 import "./ChatRoom.css";
 
-const BACKEND_URL = "http://localhost:5001";
+const BACKEND_URL = "https://web-dev-project-ds15.onrender.com";
+
 
 const ChatRoom = () => {
   const { roomName } = useParams();

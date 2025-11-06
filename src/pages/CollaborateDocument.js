@@ -4,7 +4,8 @@ import io from "socket.io-client";
 import NavbarLeft from "../components/navbar2.js";
 import "./CollaborateDocument.css";
 
-const BACKEND_URL = "http://localhost:5001";
+const BACKEND_URL = "https://web-dev-project-ds15.onrender.com";
+
 
 const CollaborateDocument = () => {
   const { checklistName, documentId } = useParams();
