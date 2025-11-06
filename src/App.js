@@ -9,6 +9,8 @@ import ChatRoom from './pages/ChatRoom';
 import Collaborate from './pages/Collaborate';
 import CollaborateDocument from './pages/CollaborateDocument';
 import InviteFriends from './pages/InviteFriends';
+import Documents from './pages/Document';
+import Uploads from './pages/uploads';
 import './App.css';
 
 function App() {
@@ -21,6 +23,8 @@ function App() {
 
       <Route path="/chat/:roomName" element={<ChatRoom />} />
       <Route path="/collaborate" element={<Collaborate />} />
+      <Route path="/documents" element={<Documents />} />
+      <Route path="/upload" element={<Uploads />} />
       <Route path="/collaborate/:checklistName/:documentId" element={<CollaborateDocument />} />
       <Route path="/invite" element={<InviteFriends />} />
     </Routes>

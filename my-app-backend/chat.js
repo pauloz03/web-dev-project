@@ -21,6 +21,5 @@ router.get("/:roomName", async (req, res) => {
   }
 });
 
-// ✅ No POST route needed; socket handles sending messages
 
 export default router;

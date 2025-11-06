@@ -53,15 +53,22 @@ html, body {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Buttons */
+/* Buttons group */
 .button-group {
   display: flex;
+  flex-direction: row; /* keep buttons side by side */
+  justify-content: space-between;
+  align-items: center;
   gap: 1rem;
   width: 100%;
+  flex-wrap: nowrap; /* prevents stacking unless on mobile */
 }
 
+/* Buttons */
 .start-chat-btn, .add-friend-btn {
   flex: 1;
+  min-width: 0; /* prevent overflow */
+  text-align: center;
   padding: 0.8rem 0;
   border-radius: 8px;
   font-weight: bold;
@@ -90,4 +97,15 @@ html, body {
 
 .add-friend-btn:hover {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive fix for small screens */
+@media (max-width: 480px) {
+  .button-group {
+    flex-direction: column;
+  }
+
+  .start-chat-btn, .add-friend-btn {
+    width: 100%;
+  }
 }

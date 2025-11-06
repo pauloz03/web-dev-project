@@ -5,7 +5,7 @@ import "./mainPage.css";
 
 const Main = () => {
   const navigate = useNavigate();
-  const [roomName, setRoomName] = useState("general");
+  const [roomName, setRoomName] = useState();
 
   const handleStartChat = () => {
     if (!roomName.trim()) return;

@@ -1,0 +1,51 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #3a0ca3, #0a1d4d);
+  font-family: Arial, sans-serif;
+}
+
+
+.documents-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.documents-panel {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  text-align: center;
+  max-width: 400px;
+}
+
+.documents-panel h2 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.documents-panel p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.upload-btn {
+  background-color: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.upload-btn:hover {
+  background-color: #5952d4;
+}

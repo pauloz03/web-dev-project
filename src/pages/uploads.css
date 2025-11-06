@@ -1,0 +1,73 @@
+/* Global reset and background */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #3a0ca3, #0a1d4d);
+  font-family: Arial, sans-serif;
+}
+
+/* Main container */
+.uploads-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Add spacing below navbar */
+.uploads-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh; /* ensure full height */
+}
+
+
+/* Upload panel card */
+.uploads-panel {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+/* Headings and text */
+.uploads-panel h2 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.uploads-panel p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* Scoped button group (won’t affect other pages) */
+.uploads-container .button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Upload buttons */
+.upload-btn {
+  background-color: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.upload-btn:hover {
+  background-color: #5952d4;
+}
