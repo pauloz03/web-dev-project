@@ -368,6 +368,32 @@
   font-style: italic;
 }
 
+/* Document-specific styles */
+.document-item {
+  cursor: pointer;
+}
+
+.document-item:hover {
+  background: #e3f2fd !important;
+  border-color: #007bff;
+}
+
+.document-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.document-name {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
 .delete-item-btn {
   background: transparent;
   border: none;

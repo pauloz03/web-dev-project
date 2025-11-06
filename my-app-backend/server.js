@@ -7,6 +7,7 @@ import http from "http";
 import { Server } from "socket.io";
 import chatRouter from "./chat.js";
 import documentsRouter from "./documents.js";
+import checklistsRouter from "./checklists.js";
 import invitationsRouter from "./invitations.js";
 import Room, { Document } from "./model.js";
 
@@ -31,6 +32,7 @@ mongoose
 // Routes
 app.use("/chat", chatRouter);
 app.use("/documents", documentsRouter);
+app.use("/checklists", checklistsRouter);
 app.use("/invitations", invitationsRouter);
 
 // Default route
@@ -128,6 +130,35 @@ io.on("connection", (socket) => {
       username,
       documentName,
     });
+  });
+
+  // Handle checklist changes (for document lists)
+  socket.on("checklist_change", async (data) => {
+    const { documentName, change, userId } = data;
+    
+    // Broadcast change to all other users in the checklist room
+    socket.to(`doc_${documentName}`).emit("checklist_change", {
+      change,
+      userId,
+      documentName,
+    });
+    
+    // Save to database
+    try {
+      const content = JSON.stringify(change.documents || []);
+      await Document.findOneAndUpdate(
+        { name: documentName },
+        { 
+          $set: { 
+            content: content,
+            updatedAt: new Date() 
+          } 
+        },
+        { upsert: true }
+      );
+    } catch (err) {
+      console.error("❌ Error saving checklist:", err);
+    }
   });
 
   // Leave document room
