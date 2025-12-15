@@ -31,7 +31,7 @@ export default function NavbarLeft() {
             <NavLink to="/collaborate" onClick={() => setIsOpen(false)}>Collaborate</NavLink>
           </li>
           <li>
-            <NavLink to="/upload" onClick={() => setIsOpen(false)}>Upload</NavLink>
+            <NavLink to="/friends" onClick={() => setIsOpen(false)}>Friends</NavLink>
           </li>
         </ul>
       </nav>

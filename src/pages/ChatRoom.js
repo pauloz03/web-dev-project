@@ -2,17 +2,21 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import io from "socket.io-client";
+import { useAuth } from "../contexts/AuthContext";
 import "./ChatRoom.css";
 
-const BACKEND_URL = "https://web-dev-project-ds15.onrender.com";
+const BACKEND_URL = "http://localhost:5001";
 
 
 const ChatRoom = () => {
   const { roomName } = useParams();
+  const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [username, setUsername] = useState("Anonymous");
   const messagesEndRef = useRef(null);
+  
+  // Get username from user email, fallback to "Anonymous" if not logged in
+  const username = user?.email || "Anonymous";
 
   const [socket, setSocket] = useState(null);
 
@@ -63,7 +67,7 @@ const ChatRoom = () => {
     if (!newMessage.trim() || !socket) return;
 
     const messageData = {
-      authorUsername: username || "Anonymous",
+      authorUsername: username,
       content: newMessage,
       room: roomName,
     };
@@ -78,14 +82,6 @@ const ChatRoom = () => {
   return (
     <div className="chat-room">
       <h2>Room: {roomName}</h2>
-
-      <input
-        type="text"
-        className="username-input"
-        placeholder="Enter your name..."
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
 
       <div className="messages">
         {messages.length > 0 ? (

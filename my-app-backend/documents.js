@@ -21,6 +21,108 @@ router.get("/", async (req, res) => {
 });
 
 /**
+ * Get user's personal documents
+ * GET /documents/personal/:userId
+ */
+router.get("/personal/:userId", async (req, res) => {
+  const { userId } = req.params;
+  
+  try {
+    const docs = await Document.find({
+      name: { $regex: `^user_${userId}_` }
+    })
+      .select("name updatedAt createdAt")
+      .sort({ updatedAt: -1 });
+    
+    // Extract document names (remove the user_${userId}_ prefix)
+    // Note: Document names are stored as-is, so we just extract them
+    const personalDocs = docs.map(doc => {
+      const docName = doc.name.replace(`user_${userId}_`, "");
+      return {
+        id: docName,
+        name: docName,
+        updatedAt: doc.updatedAt,
+        createdAt: doc.createdAt,
+      };
+    });
+    
+    res.json(personalDocs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+/**
+ * Get personal document content
+ * GET /documents/personal/:userId/:documentName
+ */
+router.get("/personal/:userId/:documentName", async (req, res) => {
+  const { userId, documentName } = req.params;
+  
+  try {
+    // Express automatically decodes URL params, but handle double encoding
+    let decodedName = documentName;
+    try {
+      decodedName = decodeURIComponent(documentName);
+    } catch (e) {
+      // Already decoded, use as-is
+      decodedName = documentName;
+    }
+    
+    const docName = `user_${userId}_${decodedName}`;
+    const doc = await Document.findOne({ name: docName });
+    
+    if (!doc) {
+      return res.json({ content: "", name: decodedName });
+    }
+    
+    res.json({ content: doc.content, name: decodedName });
+  } catch (err) {
+    console.error("Error fetching personal document:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+/**
+ * Create or update personal document
+ * POST /documents/personal/:userId/:documentName
+ */
+router.post("/personal/:userId/:documentName", async (req, res) => {
+  const { userId, documentName } = req.params;
+  const { content } = req.body;
+  
+  try {
+    // Express automatically decodes URL params, but handle double encoding
+    let decodedName = documentName;
+    try {
+      decodedName = decodeURIComponent(documentName);
+    } catch (e) {
+      // Already decoded, use as-is
+      decodedName = documentName;
+    }
+    
+    const docName = `user_${userId}_${decodedName}`;
+    console.log(`Saving document: ${docName}`);
+    
+    const doc = await Document.findOneAndUpdate(
+      { name: docName },
+      { 
+        content: content || "", 
+        updatedAt: new Date() 
+      },
+      { upsert: true, new: true }
+    );
+    
+    console.log(`Document saved successfully: ${docName}`);
+    res.json({ content: doc.content, name: decodedName });
+  } catch (err) {
+    console.error("Error saving personal document:", err);
+    res.status(500).json({ message: `Server error: ${err.message}` });
+  }
+});
+
+/**
  * Get document content (for specific document within a checklist)
  * GET /documents/:checklistName/:documentId
  */

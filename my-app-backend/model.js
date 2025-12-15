@@ -67,5 +67,38 @@ const documentSchema = new Schema(
 
 const Document = mongoose.model("Document", documentSchema);
 
+// Friend Request schema
+const friendRequestSchema = new Schema(
+  {
+    senderId: {
+      type: String,
+      required: true,
+    },
+    senderEmail: {
+      type: String,
+      required: true,
+    },
+    receiverId: {
+      type: String,
+      required: true,
+    },
+    receiverEmail: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
+    },
+  },
+  { timestamps: true }
+);
+
+// Index to prevent duplicate friend requests
+friendRequestSchema.index({ senderId: 1, receiverId: 1 }, { unique: true });
+
+const FriendRequest = mongoose.model("FriendRequest", friendRequestSchema);
+
 export default Room;
-export { Document };
+export { Document, FriendRequest };

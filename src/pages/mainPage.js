@@ -30,9 +30,13 @@ const Main = () => {
             </button>
             <button 
               className="add-friend-btn"
-              onClick={() => navigate("/invite")}
+              onClick={() => {
+                // Generate random room number
+                const randomRoomId = Math.floor(Math.random() * 1000000);
+                navigate(`/chat/${randomRoomId}`);
+              }}
             >
-              Add Friend
+              Create Room
             </button>
           </div>
         </div>

@@ -9,6 +9,7 @@ import chatRouter from "./chat.js";
 import documentsRouter from "./documents.js";
 import checklistsRouter from "./checklists.js";
 import invitationsRouter from "./invitations.js";
+import friendsRouter from "./friends.js";
 import Room, { Document } from "./model.js";
 
 dotenv.config();
@@ -34,6 +35,7 @@ app.use("/chat", chatRouter);
 app.use("/documents", documentsRouter);
 app.use("/checklists", checklistsRouter);
 app.use("/invitations", invitationsRouter);
+app.use("/friends", friendsRouter);
 
 // Default route
 app.get("/", (req, res) => {
@@ -54,22 +56,39 @@ io.on("connection", (socket) => {
   socket.on("send_message", async (data) => {
     console.log("📨 Message received:", data);
 
-    const messageObj = { ...data, createdAt: new Date() };
+    // Create message object with only schema fields (authorUsername, content)
+    const messageObj = {
+      authorUsername: data.authorUsername || "Anonymous",
+      content: data.content || "",
+      createdAt: new Date(),
+    };
 
-    // Emit immediately to everyone in room
-    io.to(data.room).emit("receive_message", messageObj);
+    // Emit immediately to everyone in room (include room for frontend)
+    io.to(data.room).emit("receive_message", { ...messageObj, room: data.room });
 
     // Save in DB asynchronously
     try {
+      if (!data.room) {
+        console.error("❌ No room specified in message data");
+        return;
+      }
+
       let room = await Room.findOne({ name: data.room });
-      if (!room) room = new Room({ name: data.room, messages: [] });
+      if (!room) {
+        room = new Room({ name: data.room, messages: [] });
+      }
+      
       room.messages.push(messageObj);
       await room.save();
+      console.log("✅ Message saved to database");
     } catch (err) {
       console.error("❌ Error saving message:", err);
+      console.error("Error details:", err.message);
     }
   });
 
+
+  //Jesus Commits. 
   // ============================================
   // REAL-TIME TEXT EDITOR EVENTS
   // ============================================

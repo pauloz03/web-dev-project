@@ -9,7 +9,9 @@ import ChatRoom from './pages/ChatRoom';
 import Collaborate from './pages/Collaborate';
 import CollaborateDocument from './pages/CollaborateDocument';
 import InviteFriends from './pages/InviteFriends';
+import Friends from './pages/Friends';
 import Documents from './pages/Document';
+import PersonalDocument from './pages/PersonalDocument';
 import Uploads from './pages/uploads';
 import './App.css';
 
@@ -26,7 +28,9 @@ function App() {
       <Route path="/documents" element={<Documents />} />
       <Route path="/upload" element={<Uploads />} />
       <Route path="/collaborate/:checklistName/:documentId" element={<CollaborateDocument />} />
+      <Route path="/documents/personal/:documentName" element={<PersonalDocument />} />
       <Route path="/invite" element={<InviteFriends />} />
+      <Route path="/friends" element={<Friends />} />
     </Routes>
   );
 }
