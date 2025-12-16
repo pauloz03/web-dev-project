@@ -6,14 +6,12 @@ import "./Collaborate.css";
 
 const BACKEND_URL = "http://localhost:5001";
 
-
 const Collaborate = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [documentName, setDocumentName] = useState("");
   const [documents, setDocuments] = useState([]);
   const [newDocumentName, setNewDocumentName] = useState("");
-  const [username, setUsername] = useState("Anonymous");
   const [isEditing, setIsEditing] = useState(false);
   const [socket, setSocket] = useState(null);
   const [draggedItem, setDraggedItem] = useState(null);
@@ -22,6 +20,9 @@ const Collaborate = () => {
   const [showSavedList, setShowSavedList] = useState(true);
   const [lastSaved, setLastSaved] = useState(null);
   const inputRef = useRef(null);
+
+  // Get logged-in user email from localStorage
+  const userEmail = localStorage.getItem("email") || "Unknown";
 
   // Initialize socket connection
   useEffect(() => {
@@ -75,24 +76,21 @@ const Collaborate = () => {
       try {
         const res = await fetch(`${BACKEND_URL}/checklists/${documentName}`);
         const data = await res.json();
-        // Checklists contain an array of documents
         setDocuments(Array.isArray(data.documents) ? data.documents : []);
       } catch (err) {
         console.error("Error fetching checklist:", err);
-        // If endpoint doesn't exist yet, try old format
         try {
           const res = await fetch(`${BACKEND_URL}/documents/${documentName}`);
           const data = await res.json();
           if (data.content) {
             const parsed = JSON.parse(data.content);
-            // Convert old items format to documents format
             if (Array.isArray(parsed)) {
               setDocuments(parsed.map(item => ({
                 id: item.id || Date.now().toString(),
                 name: item.text || item.name || "Untitled Document",
                 content: "",
                 createdAt: item.createdAt || new Date().toISOString(),
-                addedBy: item.addedBy || "Unknown"
+                addedBy: item.addedBy || userEmail
               })));
             }
           }
@@ -102,7 +100,7 @@ const Collaborate = () => {
       }
     };
     fetchChecklist();
-  }, [documentName, isEditing]);
+  }, [documentName, isEditing, userEmail]);
 
   // Listen for checklist updates from server
   useEffect(() => {
@@ -128,7 +126,6 @@ const Collaborate = () => {
     const handleChecklistChange = ({ change, userId, documentName: docName }) => {
       if (docName !== documentName || userId === socket.id) return;
 
-      // Update documents based on change type
       if (change && change.documents) {
         setDocuments(change.documents);
       }
@@ -145,30 +142,23 @@ const Collaborate = () => {
   const syncChecklist = async (updatedDocuments) => {
     if (!documentName) return;
     
-    // Try socket first (for real-time sync)
     if (socket && socket.connected) {
       socket.emit("checklist_change", {
         documentName,
-        change: {
-          documents: updatedDocuments,
-        },
+        change: { documents: updatedDocuments },
         userId: socket.id,
       });
     }
     
-    // Also save directly via HTTP as backup
     try {
       const response = await fetch(`${BACKEND_URL}/checklists/${documentName}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ documents: updatedDocuments }),
       });
       
       if (response.ok) {
         setLastSaved(new Date());
-        console.log("Checklist saved successfully");
       } else {
         console.error("Failed to save checklist:", response.status);
       }
@@ -187,7 +177,7 @@ const Collaborate = () => {
       name: newDocumentName.trim(),
       content: "",
       createdAt: new Date().toISOString(),
-      addedBy: username || "Anonymous",
+      addedBy: userEmail
     };
 
     const updatedDocuments = [...documents, newDocument];
@@ -195,17 +185,11 @@ const Collaborate = () => {
     setNewDocumentName("");
     syncChecklist(updatedDocuments);
 
-    // Also create the document in backend
     try {
       await fetch(`${BACKEND_URL}/documents/${documentName}/${newDocument.id}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          name: newDocument.name,
-          content: "" 
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newDocument.name, content: "" }),
       });
     } catch (err) {
       console.error("Error creating document:", err);
@@ -223,13 +207,9 @@ const Collaborate = () => {
   const handleDragStart = (e, index) => {
     setDraggedItem(index);
     e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/html", e.target);
-    // Find the parent checklist item and set opacity
     const itemElement = e.target.closest(".checklist-item");
     if (itemElement) {
-      setTimeout(() => {
-        itemElement.style.opacity = "0.5";
-      }, 0);
+      setTimeout(() => { itemElement.style.opacity = "0.5"; }, 0);
     }
   };
 
@@ -239,67 +219,45 @@ const Collaborate = () => {
     setDragOverIndex(index);
   };
 
-  const handleDragLeave = () => {
-    setDragOverIndex(null);
-  };
+  const handleDragLeave = () => setDragOverIndex(null);
 
   const handleDrop = (e, dropIndex) => {
     e.preventDefault();
-    
     if (draggedItem === null || draggedItem === dropIndex) {
       setDraggedItem(null);
       setDragOverIndex(null);
-      // Reset opacity
-      const items = document.querySelectorAll(".checklist-item");
-      items.forEach((item) => (item.style.opacity = "1"));
+      document.querySelectorAll(".checklist-item").forEach((item) => (item.style.opacity = "1"));
       return;
     }
 
     const newDocuments = [...documents];
     const draggedDoc = newDocuments[draggedItem];
-    
-    // Remove dragged document from its position
     newDocuments.splice(draggedItem, 1);
-    
-    // Insert at new position
     newDocuments.splice(dropIndex, 0, draggedDoc);
     
     setDocuments(newDocuments);
     syncChecklist(newDocuments);
-    
-    // Reset drag state
+
     setDraggedItem(null);
     setDragOverIndex(null);
-    
-    // Reset opacity
-    const itemElements = document.querySelectorAll(".checklist-item");
-    itemElements.forEach((item) => (item.style.opacity = "1"));
+    document.querySelectorAll(".checklist-item").forEach((item) => (item.style.opacity = "1"));
   };
 
   const handleDragEnd = () => {
     setDraggedItem(null);
     setDragOverIndex(null);
-    // Reset opacity
-    const docs = document.querySelectorAll(".checklist-item");
-    docs.forEach((doc) => (doc.style.opacity = "1"));
+    document.querySelectorAll(".checklist-item").forEach((doc) => (doc.style.opacity = "1"));
   };
 
   // Leave checklist
   const handleLeave = async () => {
-    // Final save before leaving (even if empty, to ensure it's saved)
-    if (documentName) {
-      await syncChecklist(documents);
-    }
-    
-    if (socket && documentName) {
-      socket.emit("leave_document", documentName);
-    }
-    
+    if (documentName) await syncChecklist(documents);
+    if (socket && documentName) socket.emit("leave_document", documentName);
+
     setIsEditing(false);
     setDocumentName("");
     setDocuments([]);
     setNewDocumentName("");
-    // Refresh saved checklists list
     setShowSavedList(true);
   };
 
@@ -309,9 +267,7 @@ const Collaborate = () => {
     setShowSavedList(false);
     setTimeout(() => {
       setIsEditing(true);
-      if (socket) {
-        socket.emit("join_document", name);
-      }
+      if (socket) socket.emit("join_document", name);
     }, 100);
   };
 
@@ -320,7 +276,6 @@ const Collaborate = () => {
       <NavbarLeft />
       <div className="collaborate-container">
         {!isEditing ? (
-          // Checklist selection/creation view
           <div className="document-selector">
             <h2>Collaborative Checklist</h2>
             <div className="input-group">
@@ -335,15 +290,7 @@ const Collaborate = () => {
                 Open/Create Checklist
               </button>
             </div>
-            <input
-              type="text"
-              className="username-input"
-              placeholder="Enter your name..."
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
 
-            {/* Saved Checklists List */}
             {savedChecklists.length > 0 && (
               <div className="saved-checklists">
                 <div className="saved-checklists-header">
@@ -377,18 +324,15 @@ const Collaborate = () => {
             )}
           </div>
         ) : (
-          // Checklist view
           <div className="editor-container">
             <div className="editor-header">
               <h3>Checklist: {documentName}</h3>
-            <p style={{ fontSize: '0.9rem', color: '#666', margin: 0 }}>
-              Click on a document to edit it
-            </p>
+              <p style={{ fontSize: '0.9rem', color: '#666', margin: 0 }}>
+                Click on a document to edit it
+              </p>
               <div className="header-actions">
-                <span className="username-display">{username}</span>
-                <button onClick={handleLeave} className="leave-btn">
-                  Leave
-                </button>
+                <span className="username-display">{userEmail}</span>
+                <button onClick={handleLeave} className="leave-btn">Leave</button>
               </div>
             </div>
 
@@ -402,9 +346,7 @@ const Collaborate = () => {
                   onChange={(e) => setNewDocumentName(e.target.value)}
                   className="add-item-input"
                 />
-                <button type="submit" className="add-item-btn">
-                  Add Document
-                </button>
+                <button type="submit" className="add-item-btn">Add Document</button>
               </form>
 
               <div className="checklist-items">
@@ -414,9 +356,7 @@ const Collaborate = () => {
                   documents.map((doc, index) => (
                     <div
                       key={doc.id}
-                      className={`checklist-item document-item ${
-                        dragOverIndex === index ? "drag-over" : ""
-                      } ${draggedItem === index ? "dragging" : ""}`}
+                      className={`checklist-item document-item ${dragOverIndex === index ? "drag-over" : ""} ${draggedItem === index ? "dragging" : ""}`}
                       onDragOver={(e) => handleDragOver(e, index)}
                       onDragLeave={handleDragLeave}
                       onDrop={(e) => handleDrop(e, index)}
@@ -427,30 +367,21 @@ const Collaborate = () => {
                         onDragStart={(e) => handleDragStart(e, index)}
                         onDragEnd={handleDragEnd}
                         aria-label="Drag to reorder"
-                      >
-                        ⋮⋮
-                      </span>
+                      >⋮⋮</span>
                       <div 
                         className="document-content-wrapper"
                         onClick={() => navigate(`/collaborate/${documentName}/${doc.id}`)}
                       >
                         <h4 className="document-name">{doc.name}</h4>
                         {doc.addedBy && (
-                          <span className="item-added-by">
-                            added by: {doc.addedBy}
-                          </span>
+                          <span className="item-added-by">added by: {doc.addedBy}</span>
                         )}
                       </div>
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteDocument(doc.id);
-                        }}
+                        onClick={(e) => { e.stopPropagation(); handleDeleteDocument(doc.id); }}
                         className="delete-item-btn"
                         aria-label="Delete document"
-                      >
-                        ×
-                      </button>
+                      >×</button>
                     </div>
                   ))
                 )}
@@ -458,9 +389,7 @@ const Collaborate = () => {
 
               {documents.length > 0 && (
                 <div className="checklist-stats">
-                  <span>
-                    {documents.length} document{documents.length !== 1 ? 's' : ''} in this checklist
-                  </span>
+                  <span>{documents.length} document{documents.length !== 1 ? 's' : ''} in this checklist</span>
                 </div>
               )}
             </div>
@@ -468,9 +397,7 @@ const Collaborate = () => {
             <div className="editor-footer">
               <p className="sync-indicator">
                 <span className="sync-dot"></span>
-                {lastSaved 
-                  ? `Saved ${new Date(lastSaved).toLocaleTimeString()}`
-                  : "Syncing in real-time"}
+                {lastSaved ? `Saved ${new Date(lastSaved).toLocaleTimeString()}` : "Syncing in real-time"}
               </p>
             </div>
           </div>
@@ -481,4 +408,3 @@ const Collaborate = () => {
 };
 
 export default Collaborate;
-
