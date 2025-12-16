@@ -4,7 +4,7 @@ import NavbarLeft from "../components/navbar2.js";
 import { useAuth } from "../contexts/AuthContext";
 import "./CollaborateDocument.css";
 
-const BACKEND_URL = "https://web-dev-project-1-blo3.onrender.com1";
+const BACKEND_URL = "https://web-dev-project-1-blo3.onrender.com";
 
 const PersonalDocument = () => {
   const { documentName } = useParams();
