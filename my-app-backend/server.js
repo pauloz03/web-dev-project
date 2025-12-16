@@ -14,14 +14,16 @@ import Room, { Document } from "./model.js";
 
 dotenv.config();
 
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
+  cors: { origin: FRONTEND_URL, methods: ["GET", "POST"] },
 });
 
-// Middleware
-app.use(cors());
+
+app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json());
 
 // MongoDB connection
@@ -56,53 +58,36 @@ io.on("connection", (socket) => {
   socket.on("send_message", async (data) => {
     console.log("📨 Message received:", data);
 
-    // Create message object with only schema fields (authorUsername, content)
     const messageObj = {
       authorUsername: data.authorUsername || "Anonymous",
       content: data.content || "",
       createdAt: new Date(),
     };
 
-    // Emit immediately to everyone in room (include room for frontend)
     io.to(data.room).emit("receive_message", { ...messageObj, room: data.room });
 
-    // Save in DB asynchronously
     try {
-      if (!data.room) {
-        console.error("❌ No room specified in message data");
-        return;
-      }
+      if (!data.room) return console.error("❌ No room specified in message data");
 
       let room = await Room.findOne({ name: data.room });
-      if (!room) {
-        room = new Room({ name: data.room, messages: [] });
-      }
-      
+      if (!room) room = new Room({ name: data.room, messages: [] });
+
       room.messages.push(messageObj);
       await room.save();
       console.log("✅ Message saved to database");
     } catch (err) {
-      console.error("❌ Error saving message:", err);
-      console.error("Error details:", err.message);
+      console.error("❌ Error saving message:", err.message);
     }
   });
 
-
-  //Jesus Commits. 
-  // ============================================
-  // REAL-TIME TEXT EDITOR EVENTS
-  // ============================================
-  
-  // Join document room for editing
+  // Real-time document events
   socket.on("join_document", async (documentName) => {
     socket.join(`doc_${documentName}`);
     console.log(`📝 User joined document: ${documentName}`);
-    
-    // Send current document content to the new user
+
     try {
       let doc = await Document.findOne({ name: documentName });
       if (!doc) {
-        // Create new document if it doesn't exist
         doc = new Document({ name: documentName, content: "" });
         await doc.save();
       }
@@ -112,35 +97,26 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Handle text changes (insertions, deletions)
   socket.on("text_change", async (data) => {
     const { documentName, change, userId } = data;
-    
-    // Broadcast change to all other users in the document room
+
     socket.to(`doc_${documentName}`).emit("text_change", {
       change,
       userId,
       documentName,
     });
-    
-    // Save to database (debounced - could be optimized)
+
     try {
       await Document.findOneAndUpdate(
         { name: documentName },
-        { 
-          $set: { 
-            content: data.fullContent || "", // Update full content
-            updatedAt: new Date() 
-          } 
-        },
-        { upsert: true } // Create if doesn't exist
+        { $set: { content: data.fullContent || "", updatedAt: new Date() } },
+        { upsert: true }
       );
     } catch (err) {
       console.error("❌ Error saving document:", err);
     }
   });
 
-  // Handle cursor position updates (optional, for showing where users are typing)
   socket.on("cursor_position", (data) => {
     const { documentName, position, userId, username } = data;
     socket.to(`doc_${documentName}`).emit("cursor_position", {
@@ -151,28 +127,20 @@ io.on("connection", (socket) => {
     });
   });
 
-  // Handle checklist changes (for document lists)
   socket.on("checklist_change", async (data) => {
     const { documentName, change, userId } = data;
-    
-    // Broadcast change to all other users in the checklist room
+
     socket.to(`doc_${documentName}`).emit("checklist_change", {
       change,
       userId,
       documentName,
     });
-    
-    // Save to database
+
     try {
       const content = JSON.stringify(change.documents || []);
       await Document.findOneAndUpdate(
         { name: documentName },
-        { 
-          $set: { 
-            content: content,
-            updatedAt: new Date() 
-          } 
-        },
+        { $set: { content, updatedAt: new Date() } },
         { upsert: true }
       );
     } catch (err) {
@@ -180,7 +148,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Leave document room
   socket.on("leave_document", (documentName) => {
     socket.leave(`doc_${documentName}`);
     console.log(`📝 User left document: ${documentName}`);

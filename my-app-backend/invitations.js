@@ -7,17 +7,19 @@ dotenv.config();
 
 const router = express.Router();
 
+
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+
 // Initialize Supabase Admin client (for searching users)
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY; // Admin key for server-side operations
 
 // Initialize email transporter (configure with your email service)
-// For Gmail, you'll need an "App Password" - not your regular password
 const transporter = nodemailer.createTransport({
   service: process.env.EMAIL_SERVICE || "gmail",
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD, // Use App Password for Gmail
+    pass: process.env.EMAIL_PASSWORD,
   },
 });
 
@@ -81,21 +83,20 @@ router.post("/invitations/send", async (req, res) => {
     // Check if email is configured
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
       console.warn("⚠️ Email not configured. Invitation would be sent to:", recipientEmail);
-      // In development, you might want to just log it
+      // Log the invitation link for development
       return res.json({
         message: "Invitation logged (email not configured)",
         invitation: {
           recipientEmail,
           checklistName,
           senderEmail,
-          link: `${process.env.FRONTEND_URL || "http://localhost:3000"}/collaborate?checklist=${encodeURIComponent(checklistName)}`,
+          link: `${FRONTEND_URL}/collaborate?checklist=${encodeURIComponent(checklistName)}`,
         },
       });
     }
 
     // Create invitation link
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-    const invitationLink = `${frontendUrl}/collaborate?checklist=${encodeURIComponent(checklistName)}`;
+    const invitationLink = `${FRONTEND_URL}/collaborate?checklist=${encodeURIComponent(checklistName)}`;
 
     // Email content
     const mailOptions = {
@@ -139,4 +140,3 @@ router.post("/invitations/send", async (req, res) => {
 });
 
 export default router;
-
