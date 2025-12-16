@@ -40,7 +40,7 @@ app.use("/invitations", invitationsRouter);
 app.use("/friends", friendsRouter);
 
 
-// Proper __dirname for ES modules
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -49,11 +49,9 @@ const buildPath = path.join(__dirname, "../my-app/build");
 
 app.use(express.static(buildPath));
 
-app.get("/*", (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(buildPath, "index.html"));
 });
-
-
 
 const io = new Server(server, {
   cors: { origin: FRONTEND_URL, methods: ["GET", "POST"] },
