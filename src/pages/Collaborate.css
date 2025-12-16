@@ -1,12 +1,13 @@
 .collaborate-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  max-width: 900px;
-  margin: 0 auto;
+  height: 60vh;
+  max-width: 600px;
+  margin: 10vh auto;
   padding: 2rem;
   font-family: "Poppins", sans-serif;
   background-color: #f8f9fa;
+  border-radius: 12px;
 }
 
 /* Document Selector View */
