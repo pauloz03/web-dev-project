@@ -7,6 +7,7 @@ import http from "http";
 import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 import chatRouter from "./chat.js";
 import documentsRouter from "./documents.js";
@@ -20,6 +21,7 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+// Allowed frontend origins
 const allowedOrigins = [
   "http://localhost:3000",
   "https://web-dev-project-murex.vercel.app",
@@ -41,7 +43,7 @@ app.use(
 
 app.use(express.json());
 
-// MongoDB connection
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
@@ -58,13 +60,24 @@ app.use("/friends", friendsRouter);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const buildPath = path.join(__dirname, "../my-app/build");
-app.use(express.static(buildPath));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(buildPath, "index.html"));
-});
+if (fs.existsSync(buildPath)) {
+  app.use(express.static(buildPath));
 
-// Socket.IO with same CORS rules
+  // Catch-all to serve React's index.html
+  app.get("/*", (req, res) => {
+    const indexFile = path.join(buildPath, "index.html");
+    if (fs.existsSync(indexFile)) {
+      res.sendFile(indexFile);
+    } else {
+      res.status(404).send("Frontend not built yet");
+    }
+  });
+} else {
+  console.warn("⚠️ Frontend build not found, skipping static file serving");
+}
+
+// Socket.IO
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -133,5 +146,6 @@ io.on("connection", (socket) => {
   });
 });
 
+// Start server
 const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
