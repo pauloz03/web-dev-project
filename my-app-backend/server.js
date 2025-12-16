@@ -5,6 +5,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
+import path from "path";
+
 import chatRouter from "./chat.js";
 import documentsRouter from "./documents.js";
 import checklistsRouter from "./checklists.js";
@@ -14,14 +16,11 @@ import Room, { Document } from "./model.js";
 
 dotenv.config();
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
-
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: FRONTEND_URL, methods: ["GET", "POST"] },
-});
 
+// Use this in dev for local frontend; in production, same origin
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
 app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json());
@@ -32,29 +31,34 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Routes
+// API Routes
 app.use("/chat", chatRouter);
 app.use("/documents", documentsRouter);
 app.use("/checklists", checklistsRouter);
 app.use("/invitations", invitationsRouter);
 app.use("/friends", friendsRouter);
 
-// Default route
-app.get("/", (req, res) => {
-  res.send("Hello from backend!");
+// Serve React frontend
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, "../my-app/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../my-app/build", "index.html"));
 });
 
 // Socket.io
+const io = new Server(server, {
+  cors: { origin: FRONTEND_URL, methods: ["GET", "POST"] },
+});
+
 io.on("connection", (socket) => {
   console.log("🟢 New user connected:", socket.id);
 
-  // Join room
   socket.on("join_room", (roomName) => {
     socket.join(roomName);
     console.log(`👋 User joined room: ${roomName}`);
   });
 
-  // Handle message
   socket.on("send_message", async (data) => {
     console.log("📨 Message received:", data);
 
@@ -80,7 +84,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Real-time document events
   socket.on("join_document", async (documentName) => {
     socket.join(`doc_${documentName}`);
     console.log(`📝 User joined document: ${documentName}`);
