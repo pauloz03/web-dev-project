@@ -1,0 +1,75 @@
+.static-page-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #3a0ca3, #0a1d4d);
+  font-family: Arial, sans-serif;
+  padding: 2rem 0;
+}
+
+.static-card {
+  max-width: 700px;
+  margin: 2rem;
+  background: rgba(0, 0, 0, 0.35);
+  color: white;
+  padding: 2.5rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.static-card h1 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 2.2rem;
+  text-align: center;
+}
+
+.static-card h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  color: #00bfff;
+}
+
+.static-card p {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.static-card ul {
+  padding-left: 1.5rem;
+  line-height: 1.8;
+}
+
+.static-card li {
+  margin-bottom: 1rem;
+}
+
+.static-card li strong {
+  color: #00bfff;
+}
+
+.static-card a {
+  color: #00bfff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.static-card a:hover {
+  color: #0099cc;
+  text-decoration: underline;
+}
+
+/* About Page Specific Styles */
+.about-section {
+  margin-bottom: 2.5rem;
+}
+
+.about-section:last-child {
+  margin-bottom: 0;
+}
+
+.about-section p:last-child {
+  margin-bottom: 0;
+}

@@ -24,7 +24,7 @@ export default function Navbar() {
           </li>
           <li>
             <NavLink
-              to="/contactus"
+              to="/contact"
               className={({ isActive }) => isActive ? 'active-link' : ''}
             >
                 CONTACT US

@@ -13,6 +13,8 @@ import Friends from './pages/Friends';
 import Documents from './pages/Document';
 import PersonalDocument from './pages/PersonalDocument';
 import Uploads from './pages/uploads';
+import About from './pages/About';
+import ContactUs from './pages/ContactUs';
 import './App.css';
 
 function App() {
@@ -31,6 +33,8 @@ function App() {
       <Route path="/documents/personal/:documentName" element={<PersonalDocument />} />
       <Route path="/invite" element={<InviteFriends />} />
       <Route path="/friends" element={<Friends />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<ContactUs />} />
     </Routes>
   );
 }

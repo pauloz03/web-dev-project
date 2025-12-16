@@ -1,0 +1,121 @@
+.static-page-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #3a0ca3, #0a1d4d);
+  font-family: Arial, sans-serif;
+}
+
+.static-card {
+  max-width: 700px;
+  margin: 2rem;
+  background: rgba(0, 0, 0, 0.35);
+  color: white;
+  padding: 2.5rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.static-card h1 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 2.2rem;
+}
+
+.static-card p {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.static-card ul {
+  padding-left: 1.2rem;
+}
+
+.static-card li {
+  margin-bottom: 0.5rem;
+}
+
+.static-card a {
+  color: #00bfff;
+}
+
+/* Contact Form Styles */
+.contact-form {
+  margin-top: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #00bfff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.form-textarea {
+  font-family: Arial, sans-serif;
+  resize: vertical;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 1rem;
+  background: #00bfff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.submit-button:hover {
+  background: #0099cc;
+}
+
+.success-message {
+  padding: 1.5rem;
+  background: rgba(0, 191, 255, 0.2);
+  border-radius: 8px;
+  border: 1px solid #00bfff;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.success-message p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.contact-info {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.contact-info p {
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
