@@ -5,7 +5,7 @@ import io from "socket.io-client";
 import { useAuth } from "../contexts/AuthContext";
 import "./ChatRoom.css";
 
-const BACKEND_URL = "http://localhost:5001";
+const BACKEND_URL = "https://web-dev-project-1-blo3.onrender.com";
 
 
 const ChatRoom = () => {
