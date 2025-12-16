@@ -26,6 +26,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://web-dev-project-murex.vercel.app",
   "https://web-dev-project-hmxybrzup-pauloz03s-projects.vercel.app",
+  "https://web-dev-project-3wdwiw3gc-pauloz03s-projects.vercel.app", 
 ];
 
 app.use(
